@@ -11,7 +11,7 @@ public class CsvProcessingResult {
 
 	private int validCount;
 	private int invalidCount;
-	// private List<String> errorMessages;
 	private long processingTimeMs;
+	private int commits;
 
 }

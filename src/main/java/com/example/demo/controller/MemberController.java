@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.demo.dto.CsvProcessingResult;
 import com.example.demo.dto.MemberDto;
 import com.example.demo.entity.Member;
 import com.example.demo.service.MemberService;
@@ -23,7 +24,7 @@ public class MemberController {
 	private MemberService memberService;
 
 	@PostMapping("/uploadcsv")
-	public ResponseEntity<com.example.demo.dto.CsvProcessingResult> upload(@RequestParam("file") MultipartFile file) {
+	public ResponseEntity<CsvProcessingResult> upload(@RequestParam("file") MultipartFile file) {
 		return ResponseEntity.ok(memberService.processCsvFile(file));
 	}
 
@@ -39,8 +40,26 @@ public class MemberController {
 	}
 
 	@GetMapping("/name-pattern")
-	public ResponseEntity<List<MemberDto>> getMembersByNamePattern() {
-		List<MemberDto> members = memberService.getMembersByNamePattern();
+	public ResponseEntity<List<MemberDto>> getMembersByNamePattern(
+			@RequestParam(defaultValue = "FirstName2") String firstNamePrefix,
+			@RequestParam(defaultValue = "LastName2") String lastNamePrefix) {
+
+		List<MemberDto> members = memberService.getMembersByNamePattern(firstNamePrefix, lastNamePrefix);
+
 		return ResponseEntity.ok(members);
+	}
+
+	@GetMapping("/by-dob-range")
+	public ResponseEntity<List<Member>> getMembersByDobRange(@RequestParam String startDate,
+			@RequestParam String endDate) {
+
+		List<Member> members = memberService.getMembersByDobRange(startDate, endDate);
+		return ResponseEntity.ok(members);
+	}
+
+	@GetMapping("/by-salary")
+	public ResponseEntity<?> getMembersBySalary(@RequestParam(defaultValue = "20000") String salary) {
+
+		return ResponseEntity.ok(memberService.getMembersBySalary(salary));
 	}
 }
