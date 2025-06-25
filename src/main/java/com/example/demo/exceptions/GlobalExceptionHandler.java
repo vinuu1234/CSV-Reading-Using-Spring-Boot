@@ -1,5 +1,6 @@
 package com.example.demo.exceptions;
 
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -18,6 +19,10 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<String> handleInvalidRecordException(InvalidRecordException ex) {
 		return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
 
+	}
+	@ExceptionHandler(DataIntegrityViolationException.class)
+	public ResponseEntity<String> handleDataIntegrityException(DataIntegrityViolationException ex) {
+		return ResponseEntity.status(HttpStatus.CONFLICT).body("Database constraint violation: " + ex.getMessage());
 	}
 
 	@ExceptionHandler(CsvProcessingException.class)

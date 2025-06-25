@@ -19,16 +19,18 @@ import jakarta.transaction.Transactional;
 @Repository
 public interface MemberRepository extends JpaRepository<Member, MemberId> {
 
+	boolean existsByUniqIdFirstNameAndUniqIdLastNameAndUniqIdDobAndUniqIdGender(String firstName, String lastName,
+			LocalDate dob, String gender);
+
 	List<Member> findByUniqId_FirstName(String firstName);
 
 	List<Member> findByUniqId_LastName(String lastName);
 
-	
-	//Inserting records by using native query
+	// Inserting records by using native query
 	@Modifying
 	@Transactional
 	@Query(value = """
-			INSERT IGNORE INTO members (
+			INSERT INTO members (
 			    first_name, last_name, dob, gender,
 			    member_id, education, house_number,
 			    address1, address2, pin_code,
@@ -57,8 +59,7 @@ public interface MemberRepository extends JpaRepository<Member, MemberId> {
 	@Query("SELECT m FROM Member m " + "WHERE m.uniqId.dob BETWEEN :startDate AND :endDate")
 	List<Member> findMembersByDobBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
-	
-	//Fetching records whose salary is greater than given salary
+	// Fetching records whose salary is greater than given salary
 	@Query("""
 			SELECT NEW com.example.demo.dto.MemberSalaryDto(
 			    m.memberId,

@@ -13,6 +13,7 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,8 +33,6 @@ import com.opencsv.exceptions.CsvValidationException;
 @Service
 public class MemberService {
 
-	private final SpringBootCsvFileHandlingApplication springBootCsvFileHandlingApplication;
-
 	@Autowired
 	private MemberRepository memberRepository;
 
@@ -44,13 +43,10 @@ public class MemberService {
 	int invalidCount = 0;
 
 	// Set to track unique records in memory
-	private Set<String> uniqueRecords = new HashSet<>();
+	Set<String> uniqueRecords = new HashSet<>();
 
+	// Created the Arraylist to store vallid records
 	List<Member> validRecords = new ArrayList<>();
-
-	MemberService(SpringBootCsvFileHandlingApplication springBootCsvFileHandlingApplication) {
-		this.springBootCsvFileHandlingApplication = springBootCsvFileHandlingApplication;
-	}
 
 	public CsvProcessingResult processCsvFile(MultipartFile file) {
 		long startTime = System.currentTimeMillis();
@@ -189,13 +185,17 @@ public class MemberService {
 
 	// Iterating the list and inserting to database
 	private void insertBatch(List<Member> members) {
-		members.forEach(member -> {
-			memberRepository.insertMember(member.getUniqId().getFirstName(), member.getUniqId().getLastName(),
-					member.getUniqId().getDob(), member.getUniqId().getGender(), member.getMemberId(),
-					member.getEducation(), member.getHouseNumber(), member.getAddress1(), member.getAddress2(),
-					member.getPinCode(), member.getCity(), member.getMobile(), member.getCompany(),
-					member.getMonthlySalary());
-		});
+		try {
+			members.forEach(member -> {
+				memberRepository.insertMember(member.getUniqId().getFirstName(), member.getUniqId().getLastName(),
+						member.getUniqId().getDob(), member.getUniqId().getGender(), member.getMemberId(),
+						member.getEducation(), member.getHouseNumber(), member.getAddress1(), member.getAddress2(),
+						member.getPinCode(), member.getCity(), member.getMobile(), member.getCompany(),
+						member.getMonthlySalary());
+			});
+		} catch (Exception e) {
+			throw new DataIntegrityViolationException("Duplicate data found !!!");
+		}
 	}
 
 	// Creating service which fetches records by member first name
