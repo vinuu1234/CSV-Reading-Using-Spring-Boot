@@ -1,7 +1,5 @@
 package com.example.demo.dto;
 
-import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -12,6 +10,4 @@ public class CsvProcessingResult {
 	private int validCount;
 	private int invalidCount;
 	private long processingTimeMs;
-	private int commits;
-
 }

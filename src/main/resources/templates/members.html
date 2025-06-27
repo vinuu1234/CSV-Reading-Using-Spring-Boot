@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>Members List</title>
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+	rel="stylesheet">
+</head>
+<body>
+	<div class="container mt-4">
+		<h1>Members List</h1>
+
+
+		<!-- Page size selector -->
+		<div class="page-size-selector">
+			<span>Items per page: </span> <select id="pageSize"
+				onchange="changePageSize()">
+				<option th:each="ps : ${pageSizes}" th:value="${ps}" th:text="${ps}"
+					th:selected="${ps == size}"></option>
+			</select>
+		</div>
+
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>First Name</th>
+					<th>Last Name</th>
+					<th>DOB</th>
+					<th>Gender</th>
+					<th>Member ID</th>
+					<th>Education</th>
+					<th>Mobile</th>
+					<th>Company</th>
+					<th>Salary</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr th:each="member : ${members.content}">
+					<td th:text="${member.uniqId.firstName}"></td>
+					<td th:text="${member.uniqId.lastName}"></td>
+					<td th:text="${member.uniqId.dob}"></td>
+					<td th:text="${member.uniqId.gender}"></td>
+					<td th:text="${member.memberId}"></td>
+					<td th:text="${member.education}"></td>
+					<td th:text="${member.mobile}"></td>
+					<td th:text="${member.company}"></td>
+					<td th:text="${member.monthlySalary}"></td>
+				</tr>
+			</tbody>
+		</table>
+
+		<div th:if="${totalPages > 1}">
+			<nav aria-label="Page navigation">
+				<ul class="pagination">
+					<!-- First page -->
+					<li class="page-item"
+						th:classappend="${currentPage == 0} ? 'disabled'"><a
+						class="page-link"
+						th:href="@{/api/page/get-all(page=0, size=${members.size})}">First</a>
+					</li>
+
+					<!-- Previous page -->
+					<li class="page-item"
+						th:classappend="${currentPage == 0} ? 'disabled'"><a
+						class="page-link"
+						th:href="@{/api/page/get-all(page=${currentPage-1}, size=${members.size})}">Previous</a>
+					</li>
+
+					<!-- Page numbers -->
+					<li th:each="i : ${#numbers.sequence(0, 10)}"
+						th:classappend="${i == currentPage} ? 'active'" class="page-item">
+						<a class="page-link"
+						th:href="@{/api/page/get-all(page=${i}, size=${members.size})}"
+						th:text="${i+1}">1</a>
+					</li>
+
+					<!-- Next page -->
+					<li class="page-item"
+						th:classappend="${currentPage == totalPages-1} ? 'disabled'">
+						<a class="page-link"
+						th:href="@{/api/page/get-all(page=${currentPage+1}, size=${members.size})}">Next</a>
+					</li>
+
+					<!-- Last page -->
+					<li class="page-item"
+						th:classappend="${currentPage == totalPages-1} ? 'disabled'">
+						<a class="page-link"
+						th:href="@{/api/page/get-all(page=${totalPages-1}, size=${members.size})}">Last</a>
+					</li>
+				</ul>
+			</nav>
+
+			<div class="mt-2">
+				<span>Showing page [[${currentPage+1}]] of [[${totalPages}]]</span>
+				<span> | Total members: [[${totalItems}]]</span>
+			</div>
+		</div>
+	</div>
+
+	<script>
+        function changePageSize() {
+            const size = document.getElementById('pageSize').value;
+			window.location.href = `/api/page/get-all?page=0&size=${size}`;   }
+    </script>
+
+</body>
+</html>

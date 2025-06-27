@@ -4,7 +4,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -14,39 +13,12 @@ import com.example.demo.dto.MemberSalaryDto;
 import com.example.demo.entity.Member;
 import com.example.demo.entity.MemberId;
 
-import jakarta.transaction.Transactional;
-
 @Repository
 public interface MemberRepository extends JpaRepository<Member, MemberId> {
-
-	boolean existsByUniqIdFirstNameAndUniqIdLastNameAndUniqIdDobAndUniqIdGender(String firstName, String lastName,
-			LocalDate dob, String gender);
 
 	List<Member> findByUniqId_FirstName(String firstName);
 
 	List<Member> findByUniqId_LastName(String lastName);
-
-	// Inserting records by using native query
-	@Modifying
-	@Transactional
-	@Query(value = """
-			INSERT INTO members (
-			    first_name, last_name, dob, gender,
-			    member_id, education, house_number,
-			    address1, address2, pin_code,
-			    city, mobile, company, monthly_salary
-			) VALUES (
-			    :firstName, :lastName, :dob, :gender,
-			    :memberId, :education, :houseNumber,
-			    :address1, :address2, :pinCode,
-			    :city, :mobile, :company, :monthlySalary
-			)""", nativeQuery = true)
-	void insertMember(@Param("firstName") String firstName, @Param("lastName") String lastName,
-			@Param("dob") LocalDate dob, @Param("gender") String gender, @Param("memberId") String memberId,
-			@Param("education") String education, @Param("houseNumber") String houseNumber,
-			@Param("address1") String address1, @Param("address2") String address2, @Param("pinCode") String pinCode,
-			@Param("city") String city, @Param("mobile") String mobile, @Param("company") String company,
-			@Param("monthlySalary") String monthlySalary);
 
 	// Selecting specific fields with dynamic parameters
 	@Query("SELECT NEW com.example.demo.dto.MemberDto(" + "m.memberId, m.uniqId.firstName, m.uniqId.lastName, "
